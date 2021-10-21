@@ -38,10 +38,20 @@ los mismos.
 """
 
 # Construccion de modelos
+def newIndex():
+    """
+    Inicializa el índice de avistamientos. Crea un índice a partir de las necesidades de cada requerimiento
+    """
+    Index = { 'Years': None
+               }
+    Index['Years'] = om.newMap(omaptype='BST', comparefunction=compareDates)
+    
+    return Index
 
 # Funciones para agregar informacion al catalogo
 
 # Funciones para creacion de datos
+
 
 # Funciones de consulta
 

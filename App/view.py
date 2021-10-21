@@ -36,8 +36,15 @@ operación solicitada
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("0- Cargar los datos de los avistamientos")
+    print("1- Contar los avistamientos en una ciudad")
+    print("2- Contar los avistamientos por duración")
+    print("3- Contar avistamientos por Hora/minutos del día")
+    print("4- Contar los avistamientos en un rango de fechas")
+    print("5- Contar los avistamientos de una zona geográfica")
+    print("6- Visualizar los avistamientos de una zona geográfica")
+
+
 
 catalog = None
 
@@ -53,6 +60,18 @@ while True:
     elif int(inputs[0]) == 2:
         pass
 
+    elif int(inputs[0]) == 3:
+        pass
+
+    elif int(inputs[0]) == 4:
+        pass
+
+    elif int(inputs[0]) == 5:
+        pass
+    
+    elif int(inputs[0]) == 6:
+        pass
+    
     else:
         sys.exit(0)
 sys.exit(0)
