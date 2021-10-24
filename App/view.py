@@ -25,7 +25,14 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 assert cf
-
+from tabulate import tabulate
+import sys
+import time
+from datetime import datetime
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
+default_limit = 1000
+sys.setrecursionlimit(default_limit*10)
 
 """
 La vista se encarga de la interacción con el usuario
@@ -44,9 +51,20 @@ def printMenu():
     print("5- Contar los avistamientos de una zona geográfica")
     print("6- Visualizar los avistamientos de una zona geográfica")
 
+def initIndex():
+    """
+    Inicializa el índice de avistamientos
+    """
+    return controller.initIndex()
+
+def loadData(Index):
+    """
+    Carga los avistamientos en el índice
+    """
+    controller.loadSightings(Index)
 
 
-catalog = None
+
 
 """
 Menu principal
@@ -54,8 +72,18 @@ Menu principal
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
-    if int(inputs[0]) == 1:
+    if int(inputs[0]) == 0:
         print("Cargando información de los archivos ....")
+        start_time = time.process_time()
+        Index = initIndex()
+        loadData(Index)
+
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)
+        print('La carga demoró', elapsed_time_mseg, 'segundos')
+
+    elif int(inputs[0]) == 1:
+        pass
 
     elif int(inputs[0]) == 2:
         pass
@@ -65,10 +93,10 @@ while True:
 
     elif int(inputs[0]) == 4:
         pass
-
+    
     elif int(inputs[0]) == 5:
         pass
-    
+
     elif int(inputs[0]) == 6:
         pass
     
