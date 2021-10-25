@@ -50,7 +50,6 @@ def loadSightings(Index):
     for sighting in input_file:
         j += 1
         model.addSighting_to_cities(Index, sighting)
-    created_cities = model.mp.size(Index['Cities'])
     keys = model.mp.keySet(Index['Cities'])
     maps_info = [['Ciudad', 'Cantidad de elementos', 'Altura']]
     size = model.lt.size(keys)
@@ -64,7 +63,7 @@ def loadSightings(Index):
     
 
     print('Avistamientos cargados: ', j)
-    print('Arboles creados para el requerimiento 1: ', created_cities)
+    print('Arboles creados para el requerimiento 1: ', size)
     print('Algunos de los arboles creados por ciudad junto con su información se listan a continuación: ')
     print(tabulate(maps_info, headers='firstrow', tablefmt='fancy_grid', stralign="left"))
 
