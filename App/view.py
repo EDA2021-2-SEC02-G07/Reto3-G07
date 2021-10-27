@@ -31,6 +31,7 @@ import time
 from datetime import datetime
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
+from DISClib.ADT import orderedmap as om
 default_limit = 1000
 sys.setrecursionlimit(default_limit*10)
 
@@ -43,7 +44,11 @@ operación solicitada
 
 def printMenu():
     print("Bienvenido")
+    print()
+    print('Requerimientos lab 8')
     print("0- Cargar los datos de los avistamientos")
+    print("3- Dar altura y número de elementos del árbol de una ciudad")
+    print()
     print("1- Contar los avistamientos en una ciudad")
     print("2- Contar los avistamientos por duración")
     print("3- Contar avistamientos por Hora/minutos del día")
@@ -75,10 +80,15 @@ while True:
     if int(inputs[0]) == 0:
         print("Cargando información de los archivos ....")
         start_time = time.process_time()
-        Index = initIndex()
-        loadData(Index)
+        index = initIndex()
+        loadData(index)
 
         stop_time = time.process_time()
+        print()
+        print('NOTA: ')
+        print('Para este requerimiento decidimos implementar una tabla de hash con keys un ciudad y con árboles de avistamientos como values.')
+        print('Por tanto la opción 3 de preguntar por el número de elementos y altura en este lab pide como parametro una ciudad')
+        print()
         elapsed_time_mseg = (stop_time - start_time)
         print('La carga demoró', elapsed_time_mseg, 'segundos')
 
@@ -89,8 +99,18 @@ while True:
         pass
 
     elif int(inputs[0]) == 3:
-        pass
-
+        try:
+            ciudad = input('Ingrese el nombre de una ciudad a consultar:\n')
+            arbol = me.getValue(mp.get(index['Cities'], ciudad))
+            elements = om.size(arbol)
+            height = om.height(arbol) + 1
+            print()
+            print('El número de elementos del árbol de avistamientos en la ciudad ' + ciudad + ' es de', elements )
+            print()
+            print('La altura del árbol de avistamientos en la ciudad ' + ciudad + ' es de', height )
+        except:
+            print()
+            print('ERROR: Por favor ingrese un nombre de ciudad válido.')
     elif int(inputs[0]) == 4:
         pass
     

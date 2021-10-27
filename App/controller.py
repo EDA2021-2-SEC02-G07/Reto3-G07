@@ -40,32 +40,24 @@ def initIndex():
 
 # Funciones para la carga de datos
 
-def loadSightings(Index):
+def loadSightings(index):
     """
     Carga los avistamientos del archivo. 
     """
-    SightingsFile = cf.data_dir + 'UFOS-utf8-30pct.csv'
+    SightingsFile = cf.data_dir + 'UFOS-utf8-small.csv'
     input_file = csv.DictReader(open(SightingsFile, encoding='utf-8'))
     j = 0
     for sighting in input_file:
         j += 1
-        model.addSighting_to_cities(Index, sighting)
-    keys = model.mp.keySet(Index['Cities'])
-    maps_info = [['Ciudad', 'Cantidad de elementos', 'Altura']]
-    size = model.lt.size(keys)
-    for i in range(1, size + 1): 
-        key = model.lt.getElement(keys, i)
-        mp = model.me.getValue(model.mp.get(Index['Cities'], key))
-        elements = model.om.size(mp)
-        height = model.om.height(mp)
-        if elements >= 70:
-            maps_info.append([key, elements, height])
+        model.addSighting_to_cities(index, sighting)
+
+    size = model.mp.size(index['Cities'])
+    
     
 
     print('Avistamientos cargados: ', j)
     print('Arboles creados para el requerimiento 1: ', size)
     print('Algunos de los arboles creados por ciudad junto con su información se listan a continuación: ')
-    print(tabulate(maps_info, headers='firstrow', tablefmt='fancy_grid', stralign="left"))
 
 
     
