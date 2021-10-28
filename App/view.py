@@ -51,7 +51,7 @@ def printMenu():
     print()
     print("1- Contar los avistamientos en una ciudad")
     print("2- Contar los avistamientos por duración")
-    print("3- Contar avistamientos por Hora/minutos del día")
+    print(" - Contar avistamientos por Hora/minutos del día")
     print("4- Contar los avistamientos en un rango de fechas")
     print("5- Contar los avistamientos de una zona geográfica")
     print("6- Visualizar los avistamientos de una zona geográfica")
@@ -103,7 +103,7 @@ while True:
             ciudad = input('Ingrese el nombre de una ciudad a consultar:\n')
             arbol = me.getValue(mp.get(index['Cities'], ciudad))
             elements = om.size(arbol)
-            height = om.height(arbol) + 1
+            height = om.height(arbol) 
             print()
             print('El número de elementos del árbol de avistamientos en la ciudad ' + ciudad + ' es de', elements )
             print()
