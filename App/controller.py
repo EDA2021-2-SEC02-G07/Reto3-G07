@@ -50,17 +50,29 @@ def loadSightings(index):
     for sighting in input_file:
         j += 1
         model.addSighting_to_cities(index, sighting)
+        model.addSighting_to_coordinates(index, sighting)
 
     size = model.mp.size(index['Cities'])
     
     
 
     print('Avistamientos cargados: ', j)
-    print('Arboles creados para el requerimiento 1: ', size)
-    print('Algunos de los arboles creados por ciudad junto con su información se listan a continuación: ')
+
 
 
     
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi):
+    sightings = model.sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi)
+    lensightings = len(sightings)
+    if lensightings <=10:
+        return sightings
+    else: 
+
+        sightings_lo = sightings[0:6]
+        sightings_hi = sightings[lensightings - 5: lensightings]
+        sightings_clean = sightings_lo + sightings_hi
+        return sightings_clean 
