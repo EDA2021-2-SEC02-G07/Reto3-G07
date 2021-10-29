@@ -45,21 +45,22 @@ def newIndex():
     """
     Inicializa el índice de avistamientos. Crea los maps que se van a usar en cada consulta.
     """
-    Index = { 'Cities': None
+    Index = {  'Cities': None,
+               'Coordinates': None,
                }
     Index['Cities'] = mp.newMap(700, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
-
+    Index['Latitudes'] = om.newMap(omaptype='RBT', comparefunction = cmpValues)
     
     return Index
 
 # Funciones para agregar informacion al índice
 
 def addSighting_to_cities(Index, sighting_info):
-    '''
+    """
     Agrega un avistamiento al índice por ciudades organizado por fechas.
     Los argumentos son el índice total (diccionario) y la información 
     del avistamiento (diccionario).
-    '''
+    """
     sighting = newSighting(sighting_info)
     sighting_city = sighting['city']
     sighting_datetime = sighting['datetime']
@@ -72,20 +73,46 @@ def addSighting_to_cities(Index, sighting_info):
         city = newCity()
         mp.put(cities, sighting_city, city)
         om.put(city, sighting_datetime, sighting)
+
+
+def addSighting_to_coordinates(Index, sighting_info):
+    """
+    Agrega un avistamiento el índice de coordenadas. 
+    Los argumentos son índice total (diccionario) y la información 
+    del avistamiento (diccionario).
+    """
+    sighting = newSighting2(sighting_info)
+    sighting_latitude = sighting['latitude']
+    sighting_longitude = sighting['longitude']
+    latitudes = Index['Latitudes']
+    try:
+        longitudes = om.get(latitudes, sighting_latitude)
+        om.put(longitudes, sighting_longitude, sighting)
+    except:
+        longitudes = newCoordinate()
+        om.put(longitudes, sighting_longitude, sighting)
+        om.put(latitudes, sighting_latitude, longitudes)
         
 
 
-
-
 # Funciones para creacion de datos
+
 def newCity():
     """
     Se crea una nueva ciudad en el índice de ciudades. En el índice 
-    cada ciudad es un arbol binario organizado por fecha de los 
+    cada ciudad es un arbol organizado por fecha de los 
     avistamientos
     """
-    city = om.newMap(omaptype='RBT', comparefunction=compareDates)
+    city = om.newMap(omaptype = 'RBT', comparefunction = compareDates)
     return city
+
+def newCoordinate():
+    """
+    Crea una nueva latitud en el índice de coordenadas. Cada latitud es un arbol
+    que contiene árboles de longitudes
+    """
+    coordinate = om.newMap(omaptype = 'RBT', comparefunction = cmpValues)
+    return coordinate
 
 def newSighting(sighting_info):
     """
@@ -137,8 +164,8 @@ def newSighting2(sighting_info):
     country = sighting_info['country']
     shape = sighting_info['shape']
     duration = sighting_info['duration (seconds)']
-    latitude = sighting_info['latitude']
-    longitude = sighting_info['longitude']
+    latitude = float(sighting_info['latitude'])
+    longitude = float(sighting_info['longitude'])
 
     #En este espacio se pueden limpiar los datos
 
@@ -153,6 +180,42 @@ def newSighting2(sighting_info):
     return sighting
 
 # Funciones de consulta
+def findMapkeys(map, entrylo, entryhi):
+    """
+    Retorna la pareja de llaves que delimitan un rango en un mapa ordenado. (tupla con estructura (keylo, keyhi)) 
+    Las entradas son una pareja de valores, uno menor y otro mayor (entrylo, entryhi) 
+    y el mapa. 
+    """
+    keylo = om.ceiling(map, entrylo)
+    keyhi = om.floor(map, entryhi)
+    if keyhi == None:
+        keyhi = keylo
+    if keylo == None: 
+        keylo = keyhi
+    return (keylo, keyhi)
+
+
+def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi):
+    latitudes = Index['Latitudes']
+    keylalo, keylahi = findMapkeys(latitudes, latitudelo, latitudehi)
+    latitudes_list = om.values(latitudes, keylalo, keylahi)
+    list_size = lt.size(latitudes_list)
+
+    counter = 0
+    sightings = []
+    
+    for i in range(1, list_size + 1):
+        longitudes = lt.getElement(latitudes_list, i)
+        keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
+        longitudes_list = om.values(longitudes, keylolo, keylohi)
+        longitudes_size = lt.size(longitudes_list)
+        counter += longitudes_size
+        for j in range(1, longitudes_size + 1):
+            sighting = lt.getElement(longitudes_list, j)
+            sightings.append(sighting)
+    return sightings
+
+
 
 # Funciones de comparación
 
@@ -178,6 +241,17 @@ def compareDates(date1, date2):
     elif (date1 > date2):
         return 1
     else:
+        return -1
+
+def cmpValues(value1, value2):
+    """
+    Compara dos valores numéricos o str cualquiera
+    """
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
+        return 1
+    else: 
         return -1
 
 # Funciones de ordenamiento

@@ -47,11 +47,10 @@ def printMenu():
     print()
     print('Requerimientos lab 8')
     print("0- Cargar los datos de los avistamientos")
-    print("3- Dar altura y número de elementos del árbol de una ciudad")
-    print()
+    print('')
     print("1- Contar los avistamientos en una ciudad")
     print("2- Contar los avistamientos por duración")
-    print(" - Contar avistamientos por Hora/minutos del día")
+    print("3- Contar avistamientos por Hora/minutos del día")
     print("4- Contar los avistamientos en un rango de fechas")
     print("5- Contar los avistamientos de una zona geográfica")
     print("6- Visualizar los avistamientos de una zona geográfica")
@@ -84,11 +83,6 @@ while True:
         loadData(index)
 
         stop_time = time.process_time()
-        print()
-        print('NOTA: ')
-        print('Para este requerimiento decidimos implementar una tabla de hash con keys un ciudad y con árboles de avistamientos como values.')
-        print('Por tanto la opción 3 de preguntar por el número de elementos y altura en este lab pide como parametro una ciudad')
-        print()
         elapsed_time_mseg = (stop_time - start_time)
         print('La carga demoró', elapsed_time_mseg, 'segundos')
 
@@ -99,24 +93,21 @@ while True:
         pass
 
     elif int(inputs[0]) == 3:
-        try:
-            ciudad = input('Ingrese el nombre de una ciudad a consultar:\n')
-            arbol = me.getValue(mp.get(index['Cities'], ciudad))
-            elements = om.size(arbol)
-            height = om.height(arbol) 
-            print()
-            print('El número de elementos del árbol de avistamientos en la ciudad ' + ciudad + ' es de', elements )
-            print()
-            print('La altura del árbol de avistamientos en la ciudad ' + ciudad + ' es de', height )
-        except:
-            print()
-            print('ERROR: Por favor ingrese un nombre de ciudad válido.')
+        pass
+
     elif int(inputs[0]) == 4:
         pass
     
     elif int(inputs[0]) == 5:
-        pass
-
+        coordinates = input('Ingrese las coordenadas')
+        coordinates = coordinates.split(',')
+        latitudelo = float(coordinates[0])
+        latitudehi = float(coordinates[1])
+        longitudelo = float(coordinates[2])
+        longitudehi = float(coordinates[3])
+        sightings = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi)
+        print(sightings)
+        
     elif int(inputs[0]) == 6:
         pass
     
