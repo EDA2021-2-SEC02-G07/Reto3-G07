@@ -87,7 +87,24 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos')
 
     elif int(inputs[0]) == 1:
-        pass
+        cityname = input('Ingrese el nombre de la ciudad a consultar: ')
+        sightings, size = controller.sightings_in_city(index, cityname)
+        table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
+        for sighting in sightings:
+            datetime = sighting['datetime']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            table.append([datetime, city, country, shape, duration])
+        print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
+        print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))         
+
+
+
+        print('Hay', size, 'avistamientos reportados en', cityname)
+
 
     elif int(inputs[0]) == 2:
         pass

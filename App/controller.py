@@ -65,6 +65,15 @@ def loadSightings(index):
 
 # Funciones de consulta sobre el catálogo
 
+def sightings_in_city(Index, cityname):
+    """
+    Retorna una tupla con una lista de avistamientos ordenada cronológicamente y 
+    la cantidad de avistamientos reportados en una ciudad específica.
+    Las entradas son el índice y el nombre de la ciudad
+    """
+    sightings, size = model.sightings_in_city(Index, cityname)
+    return sightings, size
+
 def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
     """
     Retorna una tupla con una lista de avistamientos y el número de avistamientos
@@ -76,4 +85,6 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     sightings, sightings_size = model.sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req)
 
     return sightings, sightings_size
+
+
 

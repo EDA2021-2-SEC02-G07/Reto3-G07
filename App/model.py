@@ -164,8 +164,8 @@ def newSighting2(sighting_info):
     country = sighting_info['country']
     shape = sighting_info['shape']
     duration = sighting_info['duration (seconds)']
-    latitude = float(sighting_info['latitude'])
-    longitude = float(sighting_info['longitude'])
+    latitude = round(float(sighting_info['latitude']), 2)
+    longitude = round(float(sighting_info['longitude']), 2)
 
     #En este espacio se pueden limpiar los datos
 
@@ -193,6 +193,30 @@ def findMapkeys(map, entrylo, entryhi):
     if keylo == None: 
         keylo = keyhi
     return (keylo, keyhi)
+
+
+def sightings_in_city(Index, cityname):
+    """
+    Retorna una tupla con una lista que contiene los primeros 3 y últimos 3 avistamientos reportados en
+    una ciudad ordenados cronológicamente. Las entradas son el índice y el nombre de la ciudad
+    """
+    city_sightings = me.getValue(mp.get(Index['Cities'], cityname))
+    keys = om.keySet(city_sightings)
+    size = lt.size(keys)
+    sightings = []
+    for i in range(1, 4):
+        key = lt.getElement(keys, i)
+        sighting = me.getValue(om.get(city_sightings, key))
+        sightings.append(sighting)
+    for i in range(size - 2, size + 1):
+        key = lt.getElement(keys, i)
+        sighting = me.getValue(om.get(city_sightings, key))
+        sightings.append(sighting)
+    return sightings, size
+
+        
+
+
 
 
 def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
@@ -258,7 +282,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
                 sightingsb.append(sighting)
                 x += 1
         for i in range(0, 5):
-            sightings.append(sightingsb[i])
+            sightings.append(sightingsb[len(sightingsb)-i-1])
     return sightings, counter
 
 
