@@ -195,7 +195,14 @@ def findMapkeys(map, entrylo, entryhi):
     return (keylo, keyhi)
 
 
-def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi):
+def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
+    """
+    Retorna una tupla que contiene una lista con los avistamientos en unas coordenadas específicas
+    y la cantidad de avistamientos en las coordenadas ingresadas.
+    Las entradas son el índice Index, las coordenadas como floats y el número del req (5 o 6)
+    Dependiendo de si el req ingresado es 5 o 6, la lista retornada contiene todos los 
+    avistamientos en el rango o los 5 primeros y 5 últimos
+    """
     latitudes = Index['Latitudes']
     keylalo, keylahi = findMapkeys(latitudes, latitudelo, latitudehi)
     latitudes_list = om.values(latitudes, keylalo, keylahi)
@@ -203,17 +210,56 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
 
     counter = 0
     sightings = []
-    
-    for i in range(1, list_size + 1):
-        longitudes = lt.getElement(latitudes_list, i)
-        keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
-        longitudes_list = om.values(longitudes, keylolo, keylohi)
-        longitudes_size = lt.size(longitudes_list)
-        counter += longitudes_size
-        for j in range(1, longitudes_size + 1):
-            sighting = lt.getElement(longitudes_list, j)
-            sightings.append(sighting)
-    return sightings
+    n = 0
+    if req == 6:
+        for i in range(1, list_size + 1):
+            longitudes = lt.getElement(latitudes_list, i)
+            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
+            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_size = lt.size(longitudes_list)
+            counter += longitudes_size
+            for j in range(1, longitudes_size + 1):
+                sighting = lt.getElement(longitudes_list, j)
+                sightings.append(sighting)
+    elif req == 5:
+        for i in range(1, list_size + 1):
+            longitudes = lt.getElement(latitudes_list, i)
+            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
+            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_size = lt.size(longitudes_list)
+            counter += longitudes_size
+            for j in range(1, longitudes_size + 1):
+                if n >= 10: 
+                    break
+                sighting = lt.getElement(longitudes_list, j)
+                sightings.append(sighting)
+                n += 1
+
+        if counter <= 10:
+            return sightings
+        else: 
+            sightings = sightings[0:5]
+
+        x = 0
+        sightingsb = []
+        for i in range(0, list_size):
+            if x >= 5:
+                break
+            pos = list_size - i
+            longitudes = lt.getElement(latitudes_list, pos)
+            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
+            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_size = lt.size(longitudes_list)
+            for j in range(0, longitudes_size):
+                if x >= 5: 
+                    break
+                pos = longitudes_size - j
+                sighting = lt.getElement(longitudes_list, pos)
+                sightingsb.append(sighting)
+                x += 1
+        for i in range(0, 5):
+            sightings.append(sightingsb[i])
+    return sightings, counter
 
 
 

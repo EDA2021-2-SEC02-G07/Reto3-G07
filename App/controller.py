@@ -44,7 +44,7 @@ def loadSightings(index):
     """
     Carga los avistamientos del archivo. 
     """
-    SightingsFile = cf.data_dir + 'UFOS-utf8-small.csv'
+    SightingsFile = cf.data_dir + 'UFOS-utf8-large.csv'
     input_file = csv.DictReader(open(SightingsFile, encoding='utf-8'))
     j = 0
     for sighting in input_file:
@@ -65,14 +65,15 @@ def loadSightings(index):
 
 # Funciones de consulta sobre el catálogo
 
-def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi):
-    sightings = model.sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi)
-    lensightings = len(sightings)
-    if lensightings <=10:
-        return sightings
-    else: 
+def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
+    """
+    Retorna una tupla con una lista de avistamientos y el número de avistamientos
+     en el rango de coordenadas ingresado.
+    Las entradas son el índice Index, las coordenadas como floats y el número del req (5 o 6)
+    Dependiendo del número de req ingresado, la lista retornada tendrá todos los avistamientos 
+    o sólo los 5 primeros y 5 últimos
+    """
+    sightings, sightings_size = model.sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req)
 
-        sightings_lo = sightings[0:6]
-        sightings_hi = sightings[lensightings - 5: lensightings]
-        sightings_clean = sightings_lo + sightings_hi
-        return sightings_clean 
+    return sightings, sightings_size
+

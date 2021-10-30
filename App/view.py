@@ -99,14 +99,26 @@ while True:
         pass
     
     elif int(inputs[0]) == 5:
-        coordinates = input('Ingrese las coordenadas')
+        coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
         coordinates = coordinates.split(',')
         latitudelo = float(coordinates[0])
         latitudehi = float(coordinates[1])
         longitudelo = float(coordinates[2])
         longitudehi = float(coordinates[3])
-        sightings = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi)
-        print(sightings)
+        sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+        table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)', 'Latitud', 'Longitud']]
+        for sighting in sightings:
+            datetime = sighting['datetime']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            latitude = float(sighting['latitude'])
+            longitude = float(sighting['longitude'])
+            table.append([datetime, city, country, shape, duration, latitude, longitude])
+        print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
+        print('Los datos de los 5 primeros y 5 últimos avistamientos son:')
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
         
     elif int(inputs[0]) == 6:
         pass
