@@ -241,19 +241,7 @@ def newSighting3(sighting_info):
     #En este espacio se pueden limpiar los datos
 
 # Funciones de consulta
-def findMapkeys(map, entrylo, entryhi):
-    """
-    Retorna la pareja de llaves que delimitan un rango en un mapa ordenado. (tupla con estructura (keylo, keyhi)) 
-    Las entradas son una pareja de valores, uno menor y otro mayor (entrylo, entryhi) 
-    y el mapa. 
-    """
-    keylo = om.ceiling(map, entrylo)
-    keyhi = om.floor(map, entryhi)
-    if keyhi == None:
-        keyhi = keylo
-    if keylo == None: 
-        keylo = keyhi
-    return (keylo, keyhi)
+
 
 
 def sightings_in_city(Index, cityname):
@@ -265,7 +253,8 @@ def sightings_in_city(Index, cityname):
     keys = om.keySet(city_sightings)
     size = lt.size(keys)
     sightings = []
-    if size >= 10:
+    sightingsb = []
+    if size >= 6:
         for i in range(1, 4):
             key = lt.getElement(keys, i)
             sighting = me.getValue(om.get(city_sightings, key))
@@ -346,8 +335,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     avistamientos en el rango o los 5 primeros y 5 últimos
     """
     latitudes = Index['Latitudes']
-    keylalo, keylahi = findMapkeys(latitudes, latitudelo, latitudehi)
-    latitudes_list = om.values(latitudes, keylalo, keylahi)
+    latitudes_list = om.values(latitudes, latitudelo, latitudehi)
     list_size = lt.size(latitudes_list)
 
     counter = 0
@@ -356,8 +344,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     if req == 6:
         for i in range(1, list_size + 1):
             longitudes = lt.getElement(latitudes_list, i)
-            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
-            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
             longitudes_size = lt.size(longitudes_list)
             counter += longitudes_size
             for j in range(1, longitudes_size + 1):
@@ -366,8 +353,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     elif req == 5:
         for i in range(1, list_size + 1):
             longitudes = lt.getElement(latitudes_list, i)
-            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
-            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
             longitudes_size = lt.size(longitudes_list)
             counter += longitudes_size
             for j in range(1, longitudes_size + 1):
@@ -389,8 +375,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
                 break
             pos = list_size - i
             longitudes = lt.getElement(latitudes_list, pos)
-            keylolo, keylohi = findMapkeys(longitudes, longitudelo, longitudehi)
-            longitudes_list = om.values(longitudes, keylolo, keylohi)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
             longitudes_size = lt.size(longitudes_list)
             for j in range(0, longitudes_size):
                 if x >= 5: 
