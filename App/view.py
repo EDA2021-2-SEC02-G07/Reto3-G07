@@ -110,7 +110,20 @@ while True:
         pass
 
     elif int(inputs[0]) == 3:
-        pass
+        timelo = input('Ingrese la hora menor del rango: ')
+        timehi = input('Ingrese la hora mayor del rango: ')
+        sightings, size = controller.sightings_in_time(index, timelo, timehi)
+        print('Hay', size, 'avistamientos reportados en el rango')
+        table = [['Hore', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
+        for sighting in sightings:
+            time = sighting['time']
+            date = sighting['date']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            table.append([time, date, city, country, shape, duration])
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
 
     elif int(inputs[0]) == 4:
         pass

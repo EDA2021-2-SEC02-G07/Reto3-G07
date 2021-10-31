@@ -47,9 +47,11 @@ def newIndex():
     """
     Index = {  'Cities': None,
                'Coordinates': None,
+               'Time': None,
                }
     Index['Cities'] = mp.newMap(700, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     Index['Latitudes'] = om.newMap(omaptype='RBT', comparefunction = cmpValues)
+    Index['Time'] = om.newMap(omaptype= 'RBT', comparefunction= cmpValues)
     
     return Index
 
@@ -73,6 +75,26 @@ def addSighting_to_cities(Index, sighting_info):
         city = newCity()
         mp.put(cities, sighting_city, city)
         om.put(city, sighting_datetime, sighting)
+
+
+def addSighting_to_times(Index, sighting_info):
+    """
+    Agrega un avistamiento en el índice por hora del día. 
+    Los argumentos son el índice total y la información del
+    avistamiento
+    """
+    sighting = newSighting3(sighting_info)
+    sighting_date = sighting['date']
+    sighting_time = sighting['time']
+    time = Index['Time']
+    if om.contains(time, sighting_time):
+        hour = me.getValue(om.get(time, sighting_time))
+        om.put(hour, sighting_date, sighting)
+    else: 
+        hour = om.newMap(omaptype= 'RBT', comparefunction= cmpValues)
+        om.put(hour, sighting_date, sighting)
+        om.put(time, sighting_time, hour)
+
 
 
 def addSighting_to_coordinates(Index, sighting_info):
@@ -167,7 +189,7 @@ def newSighting2(sighting_info):
     latitude = round(float(sighting_info['latitude']), 2)
     longitude = round(float(sighting_info['longitude']), 2)
 
-    #En este espacio se pueden limpiar los datos
+
 
     sighting['datetime'] = datetime
     sighting['city'] = city
@@ -178,6 +200,45 @@ def newSighting2(sighting_info):
     sighting['longitude'] = longitude
 
     return sighting
+
+def newSighting3(sighting_info):
+    """
+    Crea un diccionario con la información del avistamiento. 
+    Como parámetro se recibe un diccionario con la info del
+    avistamiento (sighting_info)
+    """
+
+    sighting = {'date': None,
+                'time': None,
+                'city': None,
+                'country': None, 
+                'shape': None, 
+                'duration': None,
+                'latitude': None,
+                'longitude': None
+               }
+    datetime = sighting_info['datetime']
+    city = sighting_info['city']
+    country = sighting_info['country']
+    shape = sighting_info['shape']
+    duration = sighting_info['duration (seconds)']
+    latitude = round(float(sighting_info['latitude']), 2)
+    longitude = round(float(sighting_info['longitude']), 2)
+
+
+
+    sighting['date'] = datetime[0:10]
+    sighting['time'] = datetime[11:]
+    sighting['city'] = city
+    sighting['country'] = country
+    sighting['shape'] = shape
+    sighting['duration'] = duration
+    sighting['latitude'] = latitude
+    sighting['longitude'] = longitude
+
+    return sighting
+
+    #En este espacio se pueden limpiar los datos
 
 # Funciones de consulta
 def findMapkeys(map, entrylo, entryhi):
@@ -204,18 +265,75 @@ def sightings_in_city(Index, cityname):
     keys = om.keySet(city_sightings)
     size = lt.size(keys)
     sightings = []
-    for i in range(1, 4):
-        key = lt.getElement(keys, i)
-        sighting = me.getValue(om.get(city_sightings, key))
-        sightings.append(sighting)
-    for i in range(size - 2, size + 1):
-        key = lt.getElement(keys, i)
-        sighting = me.getValue(om.get(city_sightings, key))
-        sightings.append(sighting)
+    if size >= 10:
+        for i in range(1, 4):
+            key = lt.getElement(keys, i)
+            sighting = me.getValue(om.get(city_sightings, key))
+            sightings.append(sighting)
+        for i in range(size - 2, size + 1):
+            key = lt.getElement(keys, i)
+            sighting = me.getValue(om.get(city_sightings, key))
+            sightings.append(sighting)
+    else: 
+        for i in range(1, size + 1):
+            key = lt.getElement(keys, i)
+            sighting = me.getValue(om.get(city_sightings, key))
+            sightings.append(sighting)
+            
     return sightings, size
 
         
 
+def sightings_in_time(Index, timelo, timehi):
+    
+    times = Index['Time']
+    keytimelo, keytimehi = findMapkeys(times, timelo, timehi)
+    times_list = om.values(times, keytimelo, keytimehi)
+    list_size = lt.size(times_list)
+    sightings = []
+    count = 0
+    x = 0
+    for i in range(1, list_size + 1):
+        dates = lt.getElement(times_list, i)
+        keys = om.keySet(dates)
+        keys_size = lt.size(keys)
+        count += keys_size
+        for j in range(1, keys_size + 1):
+            if x >= 6: 
+                break
+            key = lt.getElement(keys, j)
+            sighting = me.getValue(om.get(dates, key))
+            sightings.append(sighting)
+            x += 1
+    if count  <= 6: 
+        return sightings, count
+    else: 
+        sightings = sightings[0:3]
+        n = 0
+        sightingsb = []
+        for k in range(1, list_size + 1):
+            i = list_size + 1 - k
+            dates = lt.getElement(times_list, i)
+            keys = om.keySet(dates)
+            keys_size = lt.size(keys)       
+            for k in range(1, keys_size + 1):
+                j = keys_size + 1 - k
+                if n >= 3: 
+                    break
+                key = lt.getElement(keys, j)
+                sighting = me.getValue(om.get(dates, key))
+                sightingsb.append(sighting) 
+                n += 1
+        for l in range(0, 4):
+            sightings.append(sightingsb[len(sightingsb) - 1 - l])
+    return sightings, count
+
+
+
+
+
+
+    
 
 
 
@@ -260,7 +378,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
                 n += 1
 
         if counter <= 10:
-            return sightings
+            return sightings, counter
         else: 
             sightings = sightings[0:5]
 

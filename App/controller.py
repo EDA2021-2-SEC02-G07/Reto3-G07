@@ -51,10 +51,9 @@ def loadSightings(index):
         j += 1
         model.addSighting_to_cities(index, sighting)
         model.addSighting_to_coordinates(index, sighting)
+        model.addSighting_to_times(index, sighting)
 
-    size = model.mp.size(index['Cities'])
-    
-    
+
 
     print('Avistamientos cargados: ', j)
 
@@ -74,6 +73,11 @@ def sightings_in_city(Index, cityname):
     sightings, size = model.sightings_in_city(Index, cityname)
     return sightings, size
 
+def sightings_in_time(Index, timelo, timehi):
+
+    sightings, size = model.sightings_in_time(Index, timelo, timehi)
+    return sightings, size
+
 def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
     """
     Retorna una tupla con una lista de avistamientos y el número de avistamientos
@@ -85,6 +89,7 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     sightings, sightings_size = model.sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req)
 
     return sightings, sightings_size
+
 
 
 
