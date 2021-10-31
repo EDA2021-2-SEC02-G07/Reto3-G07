@@ -24,6 +24,7 @@ import config as cf
 import model
 import csv
 from tabulate import tabulate
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -50,6 +51,8 @@ def loadSightings(index):
     for sighting in input_file:
         j += 1
         model.addSighting_to_cities(index, sighting)
+        model.addDurationSec(index, sighting)
+        model.addDateToList(index, sighting)
 
     size = model.mp.size(index['Cities'])
     
@@ -62,5 +65,32 @@ def loadSightings(index):
 
     
 # Funciones de ordenamiento
+def merge(list, comparefunction):
+    return model.merge(list,comparefunction)
+
+def insertion(list, comparefunction):
+    return model.insertion(list,comparefunction)
 
 # Funciones de consulta sobre el catálogo
+def giveRangeOfDurations(sightings):
+    list = []
+    list2 = lt.newList('ARRAY_LIST')
+    n = 0
+    for x in lt.iterator(sightings):
+        n+=1
+        list += x['elements']
+    list2['elements'] = list
+    list2['size'] = len(list)
+    list2 = merge(list2,model.compareCityCountry)
+    return list2
+
+def giveRangeOfDatetimes(sightings):
+    list = []
+    list2 = lt.newList('ARRAY_LIST')
+    n = 0
+    for x in lt.iterator(sightings):
+        n+=1
+        list += x['elements']
+    list2['elements'] = list
+    list2['size'] = len(list)
+    return list2
