@@ -276,8 +276,7 @@ def sightings_in_city(Index, cityname):
 def sightings_in_time(Index, timelo, timehi):
     
     times = Index['Time']
-    keytimelo, keytimehi = findMapkeys(times, timelo, timehi)
-    times_list = om.values(times, keytimelo, keytimehi)
+    times_list = om.values(times, timelo, timehi)
     list_size = lt.size(times_list)
     sightings = []
     count = 0
@@ -313,7 +312,7 @@ def sightings_in_time(Index, timelo, timehi):
                 sighting = me.getValue(om.get(dates, key))
                 sightingsb.append(sighting) 
                 n += 1
-        for l in range(0, 4):
+        for l in range(0, 3):
             sightings.append(sightingsb[len(sightingsb) - 1 - l])
     return sightings, count
 
