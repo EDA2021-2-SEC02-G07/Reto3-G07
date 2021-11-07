@@ -89,7 +89,10 @@ while True:
     elif int(inputs[0]) == 1:
         try:
             cityname = input('Ingrese el nombre de la ciudad a consultar: ')
+            start_time = time.process_time()
             sightings, size = controller.sightings_in_city(index, cityname)
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)
         except:
             print('Por favor ingrese una ciudad válida')
             continue
@@ -103,12 +106,8 @@ while True:
             table.append([datetime, city, country, shape, duration])
         print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
         print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
-        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))         
-
-
-
-        print('Hay', size, 'avistamientos reportados en', cityname)
-
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))    
+        print('La carga demoró', elapsed_time_mseg, 'segundos')     
 
     elif int(inputs[0]) == 2:
         pass
@@ -118,11 +117,14 @@ while True:
         try:
             timelo = input('Ingrese la hora menor del rango: ')
             timehi = input('Ingrese la hora mayor del rango: ')
+            start_time = time.process_time()
             sightings, size = controller.sightings_in_time(index, timelo, timehi)
         except:
             print('Por favor ingrese un rango válido')
             continue
         last_hour, count = controller.latest_sightings(index)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)
 
 
         print('La hora más tardía a la que se han reportado avistamientos es:')
@@ -130,6 +132,7 @@ while True:
         table.append([last_hour, count])
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
         print('Hay', size, 'avistamientos reportados en el rango')
+        print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
         table = [['Hora', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
         for sighting in sightings:
             time = sighting['time']
@@ -140,6 +143,7 @@ while True:
             duration = sighting['duration']
             table.append([time, date, city, country, shape, duration])
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
+        print('La carga demoró', elapsed_time_mseg, 'segundos') 
 
     elif int(inputs[0]) == 4:
         pass
@@ -152,7 +156,10 @@ while True:
             latitudehi = float(coordinates[1])
             longitudelo = float(coordinates[2])
             longitudehi = float(coordinates[3])
+            start_time = time.process_time()
             sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)
         except: 
             print('Por favor ingrese valores de coordenadas válidos')
             continue
@@ -169,6 +176,7 @@ while True:
         print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
         print('Los datos de los 5 primeros y 5 últimos avistamientos son:')
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
+        print('La carga demoró', elapsed_time_mseg, 'segundos') 
         
     elif int(inputs[0]) == 6:
         pass
