@@ -78,6 +78,10 @@ def sightings_in_time(Index, timelo, timehi):
     sightings, size = model.sightings_in_time(Index, timelo, timehi)
     return sightings, size
 
+def latest_sightings(Index):
+    hour, size = model.latest_sightings(Index)
+    return hour, size
+
 def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
     """
     Retorna una tupla con una lista de avistamientos y el número de avistamientos

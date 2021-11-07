@@ -316,13 +316,13 @@ def sightings_in_time(Index, timelo, timehi):
             sightings.append(sightingsb[len(sightingsb) - 1 - l])
     return sightings, count
 
+def latest_sightings(Index): 
+    Times = Index['Time']
+    last_time = om.maxKey(Times)
+    latest_sighting_map = me.getValue(om.get(Times, last_time))
+    count = om.size(latest_sighting_map)
 
-
-
-
-
-    
-
+    return(last_time, count)
 
 
 def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):

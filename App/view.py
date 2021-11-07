@@ -87,8 +87,12 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos')
 
     elif int(inputs[0]) == 1:
-        cityname = input('Ingrese el nombre de la ciudad a consultar: ')
-        sightings, size = controller.sightings_in_city(index, cityname)
+        try:
+            cityname = input('Ingrese el nombre de la ciudad a consultar: ')
+            sightings, size = controller.sightings_in_city(index, cityname)
+        except:
+            print('Por favor ingrese una ciudad válida')
+            continue
         table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
         for sighting in sightings:
             datetime = sighting['datetime']
@@ -110,11 +114,23 @@ while True:
         pass
 
     elif int(inputs[0]) == 3:
-        timelo = input('Ingrese la hora menor del rango: ')
-        timehi = input('Ingrese la hora mayor del rango: ')
-        sightings, size = controller.sightings_in_time(index, timelo, timehi)
+        
+        try:
+            timelo = input('Ingrese la hora menor del rango: ')
+            timehi = input('Ingrese la hora mayor del rango: ')
+            sightings, size = controller.sightings_in_time(index, timelo, timehi)
+        except:
+            print('Por favor ingrese un rango válido')
+            continue
+        last_hour, count = controller.latest_sightings(index)
+
+
+        print('La hora más tardía a la que se han reportado avistamientos es:')
+        table = [['Hora', 'Cantidad']]
+        table.append([last_hour, count])
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
         print('Hay', size, 'avistamientos reportados en el rango')
-        table = [['Hore', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
+        table = [['Hora', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
         for sighting in sightings:
             time = sighting['time']
             date = sighting['date']
@@ -129,13 +145,17 @@ while True:
         pass
     
     elif int(inputs[0]) == 5:
-        coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
-        coordinates = coordinates.split(',')
-        latitudelo = float(coordinates[0])
-        latitudehi = float(coordinates[1])
-        longitudelo = float(coordinates[2])
-        longitudehi = float(coordinates[3])
-        sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+        try:
+            coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
+            coordinates = coordinates.split(',')
+            latitudelo = float(coordinates[0])
+            latitudehi = float(coordinates[1])
+            longitudelo = float(coordinates[2])
+            longitudehi = float(coordinates[3])
+            sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+        except: 
+            print('Por favor ingrese valores de coordenadas válidos')
+            continue
         table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)', 'Latitud', 'Longitud']]
         for sighting in sightings:
             datetime = sighting['datetime']
