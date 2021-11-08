@@ -47,11 +47,10 @@ def printMenu():
     print()
     print('Requerimientos lab 8')
     print("0- Cargar los datos de los avistamientos")
-    print("3- Dar altura y número de elementos del árbol de una ciudad")
-    print()
+    print('')
     print("1- Contar los avistamientos en una ciudad")
     print("2- Contar los avistamientos por duración")
-    print(" - Contar avistamientos por Hora/minutos del día")
+    print("3- Contar avistamientos por Hora/minutos del día")
     print("4- Contar los avistamientos en un rango de fechas")
     print("5- Contar los avistamientos de una zona geográfica")
     print("6- Visualizar los avistamientos de una zona geográfica")
@@ -84,39 +83,101 @@ while True:
         loadData(index)
 
         stop_time = time.process_time()
-        print()
-        print('NOTA: ')
-        print('Para este requerimiento decidimos implementar una tabla de hash con keys un ciudad y con árboles de avistamientos como values.')
-        print('Por tanto la opción 3 de preguntar por el número de elementos y altura en este lab pide como parametro una ciudad')
-        print()
         elapsed_time_mseg = (stop_time - start_time)
         print('La carga demoró', elapsed_time_mseg, 'segundos')
 
     elif int(inputs[0]) == 1:
-        pass
+        try:
+            cityname = input('Ingrese el nombre de la ciudad a consultar: ')
+            start_time = time.process_time()
+            sightings, size = controller.sightings_in_city(index, cityname)
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)
+        except:
+            print('Por favor ingrese una ciudad válida')
+            continue
+        table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
+        for sighting in sightings:
+            datetime = sighting['datetime']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            table.append([datetime, city, country, shape, duration])
+        print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
+        print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))    
+        print('La carga demoró', elapsed_time_mseg, 'segundos')     
 
     elif int(inputs[0]) == 2:
         pass
 
     elif int(inputs[0]) == 3:
+        
         try:
-            ciudad = input('Ingrese el nombre de una ciudad a consultar:\n')
-            arbol = me.getValue(mp.get(index['Cities'], ciudad))
-            elements = om.size(arbol)
-            height = om.height(arbol) 
-            print()
-            print('El número de elementos del árbol de avistamientos en la ciudad ' + ciudad + ' es de', elements )
-            print()
-            print('La altura del árbol de avistamientos en la ciudad ' + ciudad + ' es de', height )
+            timelo = input('Ingrese la hora menor del rango: ')
+            timehi = input('Ingrese la hora mayor del rango: ')
+            start_time = time.process_time()
+            sightings, size = controller.sightings_in_time(index, timelo, timehi)
         except:
-            print()
-            print('ERROR: Por favor ingrese un nombre de ciudad válido.')
+            print('Por favor ingrese un rango válido')
+            continue
+        last_hour, count = controller.latest_sightings(index)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)
+
+
+        print('La hora más tardía a la que se han reportado avistamientos es:')
+        table = [['Hora', 'Cantidad']]
+        table.append([last_hour, count])
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
+        print('Hay', size, 'avistamientos reportados en el rango')
+        print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
+        table = [['Hora', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
+        for sighting in sightings:
+            time = sighting['time']
+            date = sighting['date']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            table.append([time, date, city, country, shape, duration])
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
+        print('La carga demoró', elapsed_time_mseg, 'segundos') 
+
     elif int(inputs[0]) == 4:
         pass
     
     elif int(inputs[0]) == 5:
-        pass
-
+        try:
+            coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
+            coordinates = coordinates.split(',')
+            latitudelo = float(coordinates[0])
+            latitudehi = float(coordinates[1])
+            longitudelo = float(coordinates[2])
+            longitudehi = float(coordinates[3])
+            start_time = time.process_time()
+            sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)
+        except: 
+            print('Por favor ingrese valores de coordenadas válidos')
+            continue
+        table = [['Fecha y hora', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)', 'Latitud', 'Longitud']]
+        for sighting in sightings:
+            datetime = sighting['datetime']
+            city = sighting['city']
+            country = sighting['country']
+            shape = sighting['shape']
+            duration = sighting['duration']
+            latitude = float(sighting['latitude'])
+            longitude = float(sighting['longitude'])
+            table.append([datetime, city, country, shape, duration, latitude, longitude])
+        print('Hay', size, 'avistamientos dentro de las coordenadas ingresadas')
+        print('Los datos de los 5 primeros y 5 últimos avistamientos son:')
+        print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
+        print('La carga demoró', elapsed_time_mseg, 'segundos') 
+        
     elif int(inputs[0]) == 6:
         pass
     
