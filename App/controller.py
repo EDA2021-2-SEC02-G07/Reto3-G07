@@ -51,6 +51,8 @@ def loadSightings(index):
     for sighting in input_file:
         j += 1
         model.addSighting_to_cities(index, sighting)
+        model.addDurationSec(index, sighting)
+        model.addDateToList(index, sighting)
         model.addSighting_to_coordinates(index, sighting)
         model.addSighting_to_times(index, sighting)
 
@@ -110,4 +112,15 @@ def giveRangeOfDurations(sightings):
     list2['elements'] = list
     list2['size'] = len(list)
     list2 = merge(list2,model.compareCityCountry)
+    return list2
+
+def giveRangeOfDatetimes(sightings):
+    list = []
+    list2 = lt.newList('ARRAY_LIST')
+    n = 0
+    for x in lt.iterator(sightings):
+        n+=1
+        list += x['elements']
+    list2['elements'] = list
+    list2['size'] = len(list)
     return list2

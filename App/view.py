@@ -96,6 +96,33 @@ def Req2print(index, sightings):
         i += 1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
+def Req4print(index, sightings):
+    
+    print()
+    print('============== Req No.4 Outputs ==============')
+    print('Hay',om.size(index['Sdates']) ,'distintas fechas de avistamientos')
+    minKey = om.minKey(index['Sdates'])
+    oldestSight = me.getValue(om.get(index['Sdates'],minKey))
+    table = [['datetime', 'count']]
+    table.append([minKey, lt.size(oldestSight)])
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
+
+    list2 = controller.giveRangeOfDatetimes(sightings)
+    print()
+    print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
+    print('Las primeras y la últimas 3 son:')
+    table = [['datetime', 'city', 'country', 'shape', 'durations (seconds)']]
+    i = 1
+    while i <= 3:
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    i = lt.size(list2)-2
+    while i <= lt.size(list2):
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
 
 """
 Menu principal
@@ -182,7 +209,26 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos') 
 
     elif int(inputs[0]) == 4:
-        pass
+        try:
+            InitialYear = int(input('Escriba el año inicial de las obras (AAAA): '))
+            InitialMonth = int(input('Escriba el mes inicial de las obras (MM): '))
+            InitialDay = int(input('Escriba el día inicial de las obras (DD): '))
+            FinalYear = int(input('Escriba el año final de las obras (AAAA): ')) 
+            FinalMonth = int(input('Escriba el mes inicial de las obras (MM): '))
+            FinallDay = int(input('Escriba el día inicial de las obras (DD): '))
+            beginDate = str(InitialYear) +'-' + str(InitialMonth) +'-' + str(InitialDay) + ' 00:00:00'
+            endDate = str(FinalYear) + '-' + str(FinalMonth) + '-' + str(FinallDay) + ' 23:59:59'
+            bd = str(InitialYear) +'-' + str(InitialMonth) +'-' + str(InitialDay)
+            ed = str(FinalYear) + '-' + str(FinalMonth) + '-' + str(FinallDay) 
+            date_object1 = datetime.strptime(beginDate, '%Y-%m-%d %H:%M:%S')
+            date_object2 = datetime.strptime(endDate, '%Y-%m-%d %H:%M:%S')
+            print()
+            print('============== Req No.4 Inputs ==============')
+            print('Busca avistamientos entre ', bd, ' y ', ed)
+            Req4print(index, om.values(index['Sdates'], beginDate, endDate))
+        except:  
+            print()
+            print('ERROR: Por favor ingresar parámetros válidos.')   
     
     elif int(inputs[0]) == 5:
         try:

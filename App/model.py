@@ -48,11 +48,14 @@ def newIndex():
     """
     Index = { 'Cities': None,
               'durationsSec': None,
-              'Sdates': None
+              'Sdates': None,
+              'Time': None
                }
     Index['Cities'] = mp.newMap(700, maptype = 'Probing', loadfactor = 0.5, comparefunction = cmpValueWithEntry)
     Index['durationsSec'] = om.newMap('RBT', comparefunction=compareDurations)
     Index['Sdates'] = om.newMap('RBT', comparefunction=compareDatestime)
+    Index['Latitudes'] = om.newMap(omaptype='RBT', comparefunction = cmpValues)
+    Index['Time'] = om.newMap(omaptype= 'RBT', comparefunction= cmpValues)
     return Index
 
 # Funciones para agregar informacion al índice
@@ -166,10 +169,10 @@ def newSighting2(sighting_info):
     country = sighting_info['country']
     shape = sighting_info['shape']
     duration = sighting_info['duration (seconds)']
-    latitude = sighting_info['latitude']
-    longitude = sighting_info['longitude']
+    latitude = round(float(sighting_info['latitude']), 2)
+    longitude = round(float(sighting_info['longitude']), 2)
 
-    #En este espacio se pueden limpiar los datos
+
 
     sighting['datetime'] = datetime
     sighting['city'] = city
@@ -181,7 +184,163 @@ def newSighting2(sighting_info):
 
     return sighting
 
+    
+
+    #En este espacio se pueden limpiar los datos
+
+    sighting['datetime'] = datetime
+    sighting['city'] = city
+    sighting['country'] = country
+    sighting['shape'] = shape
+    sighting['duration'] = duration
+    sighting['latitude'] = latitude
+    sighting['longitude'] = longitude
+
+
+    return sighting
+
+def newSighting3(sighting_info):
+    """
+    Crea un diccionario con la información del avistamiento. 
+    Como parámetro se recibe un diccionario con la info del
+    avistamiento (sighting_info)
+    """
+
+    sighting = {'date': None,
+                'time': None,
+                'city': None,
+                'country': None, 
+                'shape': None, 
+                'duration': None,
+                'latitude': None,
+                'longitude': None
+               }
+    datetime = sighting_info['datetime']
+    city = sighting_info['city']
+    country = sighting_info['country']
+    shape = sighting_info['shape']
+    duration = sighting_info['duration (seconds)']
+    latitude = round(float(sighting_info['latitude']), 2)
+    longitude = round(float(sighting_info['longitude']), 2)
+
+
+
+    sighting['date'] = datetime[0:10]
+    sighting['time'] = datetime[11:]
+    sighting['city'] = city
+    sighting['country'] = country
+    sighting['shape'] = shape
+    sighting['duration'] = duration
+    sighting['latitude'] = latitude
+    sighting['longitude'] = longitude
+
+    return sighting
+
+def newCoordinate():
+    """
+    Crea una nueva latitud en el índice de coordenadas. Cada latitud es un arbol
+    que contiene árboles de longitudes
+    """
+    coordinate = om.newMap(omaptype = 'RBT', comparefunction = cmpValues)
+    return coordinate
+
+def addSighting_to_coordinates(Index, sighting_info):
+    """
+    Agrega un avistamiento el índice de coordenadas. 
+    Los argumentos son índice total (diccionario) y la información 
+    del avistamiento (diccionario).
+    """
+    sighting = newSighting2(sighting_info)
+    sighting_latitude = sighting['latitude']
+    sighting_longitude = sighting['longitude']
+    latitudes = Index['Latitudes']
+    try:
+        longitudes = om.get(latitudes, sighting_latitude)
+        om.put(longitudes, sighting_longitude, sighting)
+    except:
+        longitudes = newCoordinate()
+        om.put(longitudes, sighting_longitude, sighting)
+        om.put(latitudes, sighting_latitude, longitudes)
+
+def addSighting_to_times(Index, sighting_info):
+    """
+    Agrega un avistamiento en el índice por hora del día. 
+    Los argumentos son el índice total y la información del
+    avistamiento
+    """
+    sighting = newSighting3(sighting_info)
+    sighting_date = sighting['date']
+    sighting_time = sighting['time']
+    time = Index['Time']
+    if om.contains(time, sighting_time):
+        hour = me.getValue(om.get(time, sighting_time))
+        om.put(hour, sighting_date, sighting)
+    else: 
+        hour = om.newMap(omaptype= 'RBT', comparefunction= cmpValues)
+        om.put(hour, sighting_date, sighting)
+        om.put(time, sighting_time, hour)
 # Funciones de consulta
+def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
+    """
+    Retorna una tupla que contiene una lista con los avistamientos en unas coordenadas específicas
+    y la cantidad de avistamientos en las coordenadas ingresadas.
+    Las entradas son el índice Index, las coordenadas como floats y el número del req (5 o 6)
+    Dependiendo de si el req ingresado es 5 o 6, la lista retornada contiene todos los 
+    avistamientos en el rango o los 5 primeros y 5 últimos
+    """
+    latitudes = Index['Latitudes']
+    latitudes_list = om.values(latitudes, latitudelo, latitudehi)
+    list_size = lt.size(latitudes_list)
+
+    counter = 0
+    sightings = []
+    n = 0
+    if req == 6:
+        for i in range(1, list_size + 1):
+            longitudes = lt.getElement(latitudes_list, i)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
+            longitudes_size = lt.size(longitudes_list)
+            counter += longitudes_size
+            for j in range(1, longitudes_size + 1):
+                sighting = lt.getElement(longitudes_list, j)
+                sightings.append(sighting)
+    elif req == 5:
+        for i in range(1, list_size + 1):
+            longitudes = lt.getElement(latitudes_list, i)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
+            longitudes_size = lt.size(longitudes_list)
+            counter += longitudes_size
+            for j in range(1, longitudes_size + 1):
+                if n >= 10: 
+                    break
+                sighting = lt.getElement(longitudes_list, j)
+                sightings.append(sighting)
+                n += 1
+
+        if counter <= 10:
+            return sightings, counter
+        else: 
+            sightings = sightings[0:5]
+
+        x = 0
+        sightingsb = []
+        for i in range(0, list_size):
+            if x >= 5:
+                break
+            pos = list_size - i
+            longitudes = lt.getElement(latitudes_list, pos)
+            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
+            longitudes_size = lt.size(longitudes_list)
+            for j in range(0, longitudes_size):
+                if x >= 5: 
+                    break
+                pos = longitudes_size - j
+                sighting = lt.getElement(longitudes_list, pos)
+                sightingsb.append(sighting)
+                x += 1
+        for i in range(0, 5):
+            sightings.append(sightingsb[len(sightingsb)-i-1])
+    return sightings, counter
 
 # Funciones de comparación
 
@@ -236,14 +395,26 @@ def compareDatestime(date1, date2):
     """
     Compara dos fechas
     """
-    date_object1 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S').ctime()
-    date_object2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S').ctime()
+    date_object1 = datetime.strptime(date1, '%Y-%m-%d %H:%M:%S')
+    date_object2 = datetime.strptime(date2, '%Y-%m-%d %H:%M:%S')
     if (date_object1 == date_object2):
         return 0
     elif (date_object1 > date_object2):
         return 1
     else:
         return -1
+
+def cmpValues(value1, value2):
+    """
+    Compara dos valores numéricos o str cualquiera
+    """
+    if value1 == value2:
+        return 0
+    elif value1 > value2:
+        return 1
+    else: 
+        return -1
+
 # Funciones de ordenamiento
 
 def merge(list, cmpfunction):
