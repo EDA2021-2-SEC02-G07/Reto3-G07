@@ -32,6 +32,8 @@ from datetime import datetime
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import orderedmap as om
+import folium
+import webbrowser
 default_limit = 1000
 sys.setrecursionlimit(default_limit*10)
 
@@ -67,8 +69,60 @@ def loadData(Index):
     """
     controller.loadSightings(Index)
 
+def Req2print(index, sightings):
+  
+    print('============== Req No.2 Outputs ==============')
+    print('Hay',om.size(index['durationsSec']) ,'distintas duraciones de avistamientos')
+    maxKey = om.maxKey(index['durationsSec'])
+    mayorSight = me.getValue(om.get(index['durationsSec'],maxKey))
+    table = [['durations (seconds)', 'count']]
+    table.append([maxKey, lt.size(mayorSight)])
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
+    list2 = controller.giveRangeOfDurations(sightings)
+    print()
+    print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
+    print('Las primeras y la últimas 3 son:')
+    table = [['datetime', 'city', 'country', 'shape', 'durations (seconds)']]
+    i = 1
+    while i <= 3:
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    i = lt.size(list2)-2
+    while i <= lt.size(list2):
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
+def Req4print(index, sightings):
+    
+    print()
+    print('============== Req No.4 Outputs ==============')
+    print('Hay',om.size(index['Sdates']) ,'distintas fechas de avistamientos')
+    minKey = om.minKey(index['Sdates'])
+    oldestSight = me.getValue(om.get(index['Sdates'],minKey))
+    table = [['datetime', 'count']]
+    table.append([minKey, lt.size(oldestSight)])
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
+
+    list2 = controller.giveRangeOfDatetimes(sightings)
+    print()
+    print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
+    print('Las primeras y la últimas 3 son:')
+    table = [['datetime', 'city', 'country', 'shape', 'durations (seconds)']]
+    i = 1
+    while i <= 3:
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    i = lt.size(list2)-2
+    while i <= lt.size(list2):
+        sg = lt.getElement(list2, i)
+        table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
+        i += 1
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
 
 """
 Menu principal
@@ -110,7 +164,16 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos')     
 
     elif int(inputs[0]) == 2:
-        pass
+        try:
+                min = int(input('Ingrese la duración de segundos mínima:\n'))
+                max = int(input('Ingrese la duración de segundos máxima:\n'))
+                print()
+                print('============== Req No.2 Inputs ==============')
+                print('Buscando avistamientos entre', min, 'y', max)
+                Req2print(index, om.values(index['durationsSec'], min, max))
+        except:    
+                print()
+                print('ERROR: Por favor ingresar parámetros válidos.')
 
     elif int(inputs[0]) == 3:
         
@@ -146,7 +209,26 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos') 
 
     elif int(inputs[0]) == 4:
-        pass
+        try:
+            InitialYear = int(input('Escriba el año inicial de las obras (AAAA): '))
+            InitialMonth = int(input('Escriba el mes inicial de las obras (MM): '))
+            InitialDay = int(input('Escriba el día inicial de las obras (DD): '))
+            FinalYear = int(input('Escriba el año final de las obras (AAAA): ')) 
+            FinalMonth = int(input('Escriba el mes inicial de las obras (MM): '))
+            FinallDay = int(input('Escriba el día inicial de las obras (DD): '))
+            beginDate = str(InitialYear) +'-' + str(InitialMonth) +'-' + str(InitialDay) + ' 00:00:00'
+            endDate = str(FinalYear) + '-' + str(FinalMonth) + '-' + str(FinallDay) + ' 23:59:59'
+            bd = str(InitialYear) +'-' + str(InitialMonth) +'-' + str(InitialDay)
+            ed = str(FinalYear) + '-' + str(FinalMonth) + '-' + str(FinallDay) 
+            date_object1 = datetime.strptime(beginDate, '%Y-%m-%d %H:%M:%S')
+            date_object2 = datetime.strptime(endDate, '%Y-%m-%d %H:%M:%S')
+            print()
+            print('============== Req No.4 Inputs ==============')
+            print('Busca avistamientos entre ', bd, ' y ', ed)
+            Req4print(index, om.values(index['Sdates'], beginDate, endDate))
+        except:  
+            print()
+            print('ERROR: Por favor ingresar parámetros válidos.')   
     
     elif int(inputs[0]) == 5:
         try:
@@ -179,7 +261,23 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos') 
         
     elif int(inputs[0]) == 6:
-        pass
+        coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
+        coordinates = coordinates.split(',')
+        latitudelo = float(coordinates[0])
+        latitudehi = float(coordinates[1])
+        longitudelo = float(coordinates[2])
+        longitudehi = float(coordinates[3])
+        sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 6)
+        mi_mapa = folium.Map(location=(30,-100), zoom_start=4)
+        for sighting in sightings:
+            latitude = float(sighting['latitude'])
+            longitude = float(sighting['longitude'])
+            marcador = folium.Marker(location=(latitude, longitude))
+            marcador.add_to(mi_mapa)
+        
+        mi_mapa.save("mapa.html")
+        webbrowser.open_new('mapa.html')
+         
     
     else:
         sys.exit(0)
