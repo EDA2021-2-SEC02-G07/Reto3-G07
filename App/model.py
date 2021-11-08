@@ -106,6 +106,7 @@ def addDurationSec(index, sighting):
         list = me.getValue(om.get(durations, key)) 
         lt.addLast(list, sighting)
 
+
 # Funciones para creacion de datos
 def newCity():
     """
