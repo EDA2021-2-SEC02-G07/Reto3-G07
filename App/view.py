@@ -118,11 +118,12 @@ def Req4print(index, sightings):
         key = (lt.getElement(mayorSight, 1)['datetime'])
         table.append([key, lt.size(mayorSight)])
         n += 1
-    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
+    
 
     list2 = controller.giveRangeOfDatetimes(sightings)
     stop_time = time.process_time()
     elapsed_time_mseg = (stop_time - start_time)
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
     print()
     print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
     print('Las primeras y la últimas 3 son:')
@@ -275,6 +276,8 @@ while True:
         
     elif int(inputs[0]) == 6:
         try:
+            
+            start_time = time.process_time()
             latitudelo = float(input('Ingrese las latitud menor del rango": '))
             latitudehi = float(input('Ingrese las latitud mayor del rango": '))
             longitudelo = float(input('Ingrese las longitud menor del rango": '))
@@ -289,6 +292,9 @@ while True:
             
             mi_mapa.save("mapa.html")
             webbrowser.open_new('mapa.html')
+            stop_time = time.process_time()
+            elapsed_time_mseg = (stop_time - start_time)
+            print('La carga demoró', elapsed_time_mseg, 'segundos')
         except: 
             print('Por favor ingrese valores de coordenadas válidos')
             continue 
