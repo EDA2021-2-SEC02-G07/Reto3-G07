@@ -45,7 +45,7 @@ def loadSightings(index):
     """
     Carga los avistamientos del archivo. 
     """
-    SightingsFile = cf.data_dir + 'UFOS-utf8-small.csv'
+    SightingsFile = cf.data_dir + 'UFOS-utf8-large.csv'
     input_file = csv.DictReader(open(SightingsFile, encoding='utf-8'))
     j = 0
     for sighting in input_file:

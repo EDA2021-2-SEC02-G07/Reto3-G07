@@ -198,13 +198,13 @@ while True:
         print('Los datos de los 3 primeros y 3 últimos avistamientos son:')
         table = [['Hora', 'Fecha', 'Ciudad', 'País', 'Forma del objeto', 'Duración (s)']]
         for sighting in sightings:
-            time = sighting['time']
+            time1 = sighting['time']
             date = sighting['date']
             city = sighting['city']
             country = sighting['country']
             shape = sighting['shape']
             duration = sighting['duration']
-            table.append([time, date, city, country, shape, duration])
+            table.append([time1, date, city, country, shape, duration])
         print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
         print('La carga demoró', elapsed_time_mseg, 'segundos') 
 
