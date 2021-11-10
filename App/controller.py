@@ -103,11 +103,12 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     return sightings, sightings_size
 
 def giveRangeOfDurations(sightings):
+    """
+    Retorna una lista de tipo array list, organizada por duración, ciudad y país.
+    """
     list = []
     list2 = lt.newList('ARRAY_LIST')
-    n = 0
     for x in lt.iterator(sightings):
-        n+=1
         list += x['elements']
     list2['elements'] = list
     list2['size'] = len(list)
@@ -117,9 +118,7 @@ def giveRangeOfDurations(sightings):
 def giveRangeOfDatetimes(sightings):
     list = []
     list2 = lt.newList('ARRAY_LIST')
-    n = 0
     for x in lt.iterator(sightings):
-        n+=1
         list += x['elements']
     list2['elements'] = list
     list2['size'] = len(list)

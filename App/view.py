@@ -47,9 +47,8 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print()
-    print('Requerimientos lab 8')
     print("0- Cargar los datos de los avistamientos")
-    print('')
+    print()
     print("1- Contar los avistamientos en una ciudad")
     print("2- Contar los avistamientos por duración")
     print("3- Contar avistamientos por Hora/minutos del día")
@@ -70,16 +69,24 @@ def loadData(Index):
     controller.loadSightings(Index)
 
 def Req2print(index, sightings):
-  
+    mapa = index['durationsSec']
+    n = om.size(mapa)
+    m = n - 5
     print('============== Req No.2 Outputs ==============')
-    print('Hay',om.size(index['durationsSec']) ,'distintas duraciones de avistamientos')
-    maxKey = om.maxKey(index['durationsSec'])
-    mayorSight = me.getValue(om.get(index['durationsSec'],maxKey))
+    print('Hay',n ,'distintas duraciones de avistamientos')
+    start_time = time.process_time()
+    totalsightings = om.values(mapa, om.minKey(mapa), om.maxKey(mapa))
     table = [['durations (seconds)', 'count']]
-    table.append([maxKey, lt.size(mayorSight)])
+    while n > m:
+        mayorSight = lt.getElement(totalsightings, n)
+        key = float(lt.getElement(mayorSight, 1)['duration (seconds)'])
+        table.append([key, lt.size(mayorSight)])
+        n -= 1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
     list2 = controller.giveRangeOfDurations(sightings)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)
     print()
     print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
     print('Las primeras y la últimas 3 son:')
@@ -95,19 +102,27 @@ def Req2print(index, sightings):
         table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
         i += 1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
+    print('La carga demoró', elapsed_time_mseg, 'segundos')
 
 def Req4print(index, sightings):
-    
+    mapa = index['Sdates']
+    n = 1
     print()
     print('============== Req No.4 Outputs ==============')
     print('Hay',om.size(index['Sdates']) ,'distintas fechas de avistamientos')
-    minKey = om.minKey(index['Sdates'])
-    oldestSight = me.getValue(om.get(index['Sdates'],minKey))
-    table = [['datetime', 'count']]
-    table.append([minKey, lt.size(oldestSight)])
-    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))
+    start_time = time.process_time()
+    totalsightings = om.values(mapa, om.minKey(mapa), om.maxKey(mapa))
+    table = [['durations (seconds)', 'count']]
+    while n <= 5:
+        mayorSight = lt.getElement(totalsightings, n)
+        key = (lt.getElement(mayorSight, 1)['datetime'])
+        table.append([key, lt.size(mayorSight)])
+        n += 1
+    print(tabulate(table, headers='firstrow', tablefmt='fancy_grid')) 
 
     list2 = controller.giveRangeOfDatetimes(sightings)
+    stop_time = time.process_time()
+    elapsed_time_mseg = (stop_time - start_time)
     print()
     print('Hay', lt.size(list2), 'avistamientos en el rango de duraciones.')
     print('Las primeras y la últimas 3 son:')
@@ -123,7 +138,7 @@ def Req4print(index, sightings):
         table.append([sg['datetime'], sg['city'], sg['country'], sg['shape'], sg['duration (seconds)']])
         i += 1
     print(tabulate(table, headers='firstrow', tablefmt='fancy_grid'))  
-
+    print('La carga demoró', elapsed_time_mseg, 'segundos')
 """
 Menu principal
 """
@@ -165,8 +180,8 @@ while True:
 
     elif int(inputs[0]) == 2:
         try:
-                min = int(input('Ingrese la duración de segundos mínima:\n'))
-                max = int(input('Ingrese la duración de segundos máxima:\n'))
+                min = float(input('Ingrese la duración de segundos mínima:\n'))
+                max = float(input('Ingrese la duración de segundos máxima:\n'))
                 print()
                 print('============== Req No.2 Inputs ==============')
                 print('Buscando avistamientos entre', min, 'y', max)
@@ -232,12 +247,10 @@ while True:
     
     elif int(inputs[0]) == 5:
         try:
-            coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
-            coordinates = coordinates.split(',')
-            latitudelo = float(coordinates[0])
-            latitudehi = float(coordinates[1])
-            longitudelo = float(coordinates[2])
-            longitudehi = float(coordinates[3])
+            latitudelo = float(input('Ingrese las latitud menor del rango": '))
+            latitudehi = float(input('Ingrese las latitud mayor del rango": '))
+            longitudelo = float(input('Ingrese las longitud menor del rango": '))
+            longitudehi = float(input('Ingrese las longitud mayor del rango": '))
             start_time = time.process_time()
             sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
             stop_time = time.process_time()
@@ -261,23 +274,24 @@ while True:
         print('La carga demoró', elapsed_time_mseg, 'segundos') 
         
     elif int(inputs[0]) == 6:
-        coordinates = input('Ingrese las coordenadas en formato "Latitud1, Latitud2, Longitud1, longitud2": ')
-        coordinates = coordinates.split(',')
-        latitudelo = float(coordinates[0])
-        latitudehi = float(coordinates[1])
-        longitudelo = float(coordinates[2])
-        longitudehi = float(coordinates[3])
-        sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 6)
-        mi_mapa = folium.Map(location=(30,-100), zoom_start=4)
-        for sighting in sightings:
-            latitude = float(sighting['latitude'])
-            longitude = float(sighting['longitude'])
-            marcador = folium.Marker(location=(latitude, longitude))
-            marcador.add_to(mi_mapa)
-        
-        mi_mapa.save("mapa.html")
-        webbrowser.open_new('mapa.html')
-         
+        try:
+            latitudelo = float(input('Ingrese las latitud menor del rango": '))
+            latitudehi = float(input('Ingrese las latitud mayor del rango": '))
+            longitudelo = float(input('Ingrese las longitud menor del rango": '))
+            longitudehi = float(input('Ingrese las longitud mayor del rango": '))
+            sightings, size = controller.sightings_in_coordinates(index, latitudelo, latitudehi, longitudelo, longitudehi, 5)
+            mi_mapa = folium.Map(location=(30,-100), zoom_start=4)
+            for sighting in sightings:
+                latitude = float(sighting['latitude'])
+                longitude = float(sighting['longitude'])
+                marcador = folium.Marker(location=(latitude, longitude))
+                marcador.add_to(mi_mapa)
+            
+            mi_mapa.save("mapa.html")
+            webbrowser.open_new('mapa.html')
+        except: 
+            print('Por favor ingrese valores de coordenadas válidos')
+            continue 
     
     else:
         sys.exit(0)

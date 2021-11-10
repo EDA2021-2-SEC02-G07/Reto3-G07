@@ -112,27 +112,7 @@ def addSighting_to_times(Index, sighting_info):
         hour = om.newMap(omaptype= 'RBT', comparefunction= cmpValues)
         om.put(hour, sighting_date, sighting)
         om.put(time, sighting_time, hour)
-
-
-
-def addSighting_to_coordinates(Index, sighting_info):
-    """
-    Agrega un avistamiento el índice de coordenadas. 
-    Los argumentos son índice total (diccionario) y la información 
-    del avistamiento (diccionario).
-    """
-    sighting = newSighting2(sighting_info)
-    sighting_latitude = sighting['latitude']
-    sighting_longitude = sighting['longitude']
-    latitudes = Index['Latitudes']
-    try:
-        longitudes = om.get(latitudes, sighting_latitude)
-        om.put(longitudes, sighting_longitude, sighting)
-    except:
-        longitudes = newCoordinate()
-        om.put(longitudes, sighting_longitude, sighting)
-        om.put(latitudes, sighting_latitude, longitudes)
-        
+    
 def addDurationSec(index, sighting):
     """
     Añade un avistamiento al árbol de avisatamientos organizado por duración del avistamiento.
@@ -565,6 +545,8 @@ def compareDurations(key1, key2):
     """
     Compara dos duraciones.
     """
+    key1 = float(key1)
+    key2 = float(key2)
     if (key1 == key2):
         return 0
     elif (key1 > key2):
