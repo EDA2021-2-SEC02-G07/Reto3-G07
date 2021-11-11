@@ -281,11 +281,14 @@ def addSighting_to_coordinates(Index, sighting_info):
     sighting_longitude = sighting['longitude']
     latitudes = Index['Latitudes']
     try:
-        longitudes = om.get(latitudes, sighting_latitude)
-        om.put(longitudes, sighting_longitude, sighting)
+        longitudes = me.getValue(om.get(latitudes, sighting_latitude))
+        lista = me.getValue(om.get(longitudes, sighting_longitude))
+        lt.addLast(lista,sighting)
     except:
         longitudes = newCoordinate()
-        om.put(longitudes, sighting_longitude, sighting)
+        lista = lt.newList('ARRAY_LIST')
+        lt.addLast(lista,sighting)
+        om.put(longitudes, sighting_longitude, lista)
         om.put(latitudes, sighting_latitude, longitudes)
 
 def addSighting_to_times(Index, sighting_info):
@@ -318,55 +321,24 @@ def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitu
     latitudes_list = om.values(latitudes, latitudelo, latitudehi)
     list_size = lt.size(latitudes_list)
 
-    counter = 0
+    
     sightings = []
-    n = 0
-    if req == 6:
-        for i in range(1, list_size + 1):
-            longitudes = lt.getElement(latitudes_list, i)
+    if req == 5:
+        for longitudes in lt.iterator(latitudes_list):
             longitudes_list = om.values(longitudes, longitudelo, longitudehi)
             longitudes_size = lt.size(longitudes_list)
-            counter += longitudes_size
             for j in range(1, longitudes_size + 1):
                 sighting = lt.getElement(longitudes_list, j)
-                sightings.append(sighting)
-    elif req == 5:
-        for i in range(1, list_size + 1):
-            longitudes = lt.getElement(latitudes_list, i)
-            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
-            longitudes_size = lt.size(longitudes_list)
-            counter += longitudes_size
-            for j in range(1, longitudes_size + 1):
-                if n >= 10: 
-                    break
-                sighting = lt.getElement(longitudes_list, j)
-                sightings.append(sighting)
-                n += 1
+                for x in lt.iterator(sighting):
+                    sightings.append(x)
 
-        if counter <= 10:
-            return sightings, counter
+        if len(sightings) <= 10:
+            return sightings, len(sightings)
         else: 
-            sightings = sightings[0:5]
+            s1 = sightings[0:5]
+            s2 = sightings[len(sightings)-5:]
 
-        x = 0
-        sightingsb = []
-        for i in range(0, list_size):
-            if x >= 5:
-                break
-            pos = list_size - i
-            longitudes = lt.getElement(latitudes_list, pos)
-            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
-            longitudes_size = lt.size(longitudes_list)
-            for j in range(0, longitudes_size):
-                if x >= 5: 
-                    break
-                pos = longitudes_size - j
-                sighting = lt.getElement(longitudes_list, pos)
-                sightingsb.append(sighting)
-                x += 1
-        for i in range(0, 5):
-            sightings.append(sightingsb[len(sightingsb)-i-1])
-    return sightings, counter
+    return s1 + s2, len(sightings)
 
 
 
@@ -451,67 +423,6 @@ def latest_sightings(Index):
     return(last_time, count)
 
 
-def sightings_in_coordinates(Index, latitudelo, latitudehi, longitudelo, longitudehi, req):
-    """
-    Retorna una tupla que contiene una lista con los avistamientos en unas coordenadas específicas
-    y la cantidad de avistamientos en las coordenadas ingresadas.
-    Las entradas son el índice Index, las coordenadas como floats y el número del req (5 o 6)
-    Dependiendo de si el req ingresado es 5 o 6, la lista retornada contiene todos los 
-    avistamientos en el rango o los 5 primeros y 5 últimos
-    """
-    latitudes = Index['Latitudes']
-    latitudes_list = om.values(latitudes, latitudelo, latitudehi)
-    list_size = lt.size(latitudes_list)
-
-    counter = 0
-    sightings = []
-    n = 0
-    if req == 6:
-        for i in range(1, list_size + 1):
-            longitudes = lt.getElement(latitudes_list, i)
-            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
-            longitudes_size = lt.size(longitudes_list)
-            counter += longitudes_size
-            for j in range(1, longitudes_size + 1):
-                sighting = lt.getElement(longitudes_list, j)
-                sightings.append(sighting)
-    elif req == 5:
-        for i in range(1, list_size + 1):
-            longitudes = lt.getElement(latitudes_list, i)
-            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
-            longitudes_size = lt.size(longitudes_list)
-            counter += longitudes_size
-            for j in range(1, longitudes_size + 1):
-                if n >= 10: 
-                    break
-                sighting = lt.getElement(longitudes_list, j)
-                sightings.append(sighting)
-                n += 1
-
-        if counter <= 10:
-            return sightings, counter
-        else: 
-            sightings = sightings[0:5]
-
-        x = 0
-        sightingsb = []
-        for i in range(0, list_size):
-            if x >= 5:
-                break
-            pos = list_size - i
-            longitudes = lt.getElement(latitudes_list, pos)
-            longitudes_list = om.values(longitudes, longitudelo, longitudehi)
-            longitudes_size = lt.size(longitudes_list)
-            for j in range(0, longitudes_size):
-                if x >= 5: 
-                    break
-                pos = longitudes_size - j
-                sighting = lt.getElement(longitudes_list, pos)
-                sightingsb.append(sighting)
-                x += 1
-        for i in range(0, 5):
-            sightings.append(sightingsb[len(sightingsb)-i-1])
-    return sightings, counter
 
 
 
